@@ -1,82 +1,73 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import React, { useState } from "react";
-import { Button, Form } from "react-bootstrap";
+import { Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { v4 as uuid } from "uuid";
-import Students from "./Students";
-
-function Add(props) {
-  const [name, setName] = useState("");
-  const [age, setAge] = useState("");
-  const [std, setStd] = useState("");
-  const [rollNo, setRollNo] = useState("");
-
+function Edit(props) {
+  const student = props.student;
+  const [name, setName] = useState(student.name);
+  const [age, setAge] = useState(student.age);
+  const [std, setStd] = useState(student.std);
+  const [rollNo, setRollNo] = useState(student.rollNo);
 
   let history = useNavigate();
 
   const handleSubmit = (event) => {
-    props.addMethod("Praveen");
     event.preventDefault();
-    const ids = uuid();
-    let uniqueId = ids.slice(0, 8);
+    props.handleEditMethod();
 
-    let a = name;
-    let b = age;
-    let c = std;
-    let d = rollNo;
-
-    props.student.push({ id: uniqueId, name: a, age: b, std: c, rollNo: d });
     history("/");
   };
-
-  
 
   return (
     <div>
       <Form className="d-grid">
-        <Form.Group className="mb-3 formInput " controlId="formName">
+        <Form.Group className="mb-3 formInput ">
           <Form.Control
             className="my-1"
             type="text"
+            id="name"
+            value={name}
             placeholder="Enter Name"
-            required
             onChange={(e) => setName(e.target.value)}
           ></Form.Control>
           <Form.Control
             className="my-1"
             type="text"
+            id="age"
+            value={age}
             placeholder="Enter Age"
-            required
             onChange={(e) => setAge(e.target.value)}
           ></Form.Control>
           <Form.Control
             className="my-1"
             type="text"
+            id="std"
+            value={std}
             placeholder="Enter Std"
-            required
             onChange={(e) => setStd(e.target.value)}
           ></Form.Control>
           <Form.Control
             className="my-1"
             type="text"
+            id="rollNo"
+            value={rollNo}
             placeholder="Enter RollNo"
-            required
             onChange={(e) => setRollNo(e.target.value)}
           ></Form.Control>
-        <div class="d-flex justify-content-end">
+        </Form.Group>
+        <div className="d-flex justify-content-end">
           <button
-            onClick={handleSubmit}
+            onClick={(e) => handleSubmit(e)}
             className="btn btn-primary btn-sm mx-1 my-1"
             type="submit"
+            // handleEdit={handleEditMethod}
           >
-            Submit
+            Update
           </button>
-          
         </div>
-        </Form.Group>
       </Form>
     </div>
   );
 }
 
-export default Add;
+export default Edit;

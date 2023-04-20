@@ -1,61 +1,75 @@
-import React from "react";
-import { Table } from "react-bootstrap";
-// import "bootstrap/dist/css/bootstrap.min.css";
-import Dialog from "@material-ui/core/Dialog";
-import { DialogContent, DialogContentText, DialogTitle } from "@mui/material";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { Modal, Table } from "react-bootstrap";
+
+import { useNavigate } from "react-router-dom";
 import Add from "./Add";
+import Edit from "./Edit";
 import Students from "./Students";
-
-
-import DialogActions from "@material-ui/core/DialogActions";
-
-import Button from "@material-ui/core/Button";
 
 function Home() {
   let history = useNavigate();
 
-  const handleEdit = (id, name, age, std, rollNo) => {
-   // console.log("QQQQQQQQQQQQQQQQQQQQQ"+rollNo)
-     localStorage.setItem('name',name);
-     localStorage.setItem('age',age);
-     localStorage.setItem('id',id);
-     localStorage.setItem('std',std)
-     localStorage.setItem('rollNo',rollNo)
-  };
+  const [students, setStudents] = useState([]);
+
+  console.log("qqqq",students)
+
+  const [showAdd, setShowAdd] = useState(false);
+  const handleShowAdd = () => setShowAdd(true);
+  const handleCloseAdd = () => setShowAdd(false);
+
+  const [showEdit, setShowEdit] = useState(false);
+  const handleShowEdit = () => setShowEdit(true);
+  const handleCloseEdit = () => setShowEdit(false);
 
   const handleDelete = (id) => {
-    var index = Students.map(function (e) {
-      return e.id;
-    }).indexOf(id, 0);
-    
-    Students.splice(index, 1);
+    var index = students
+      .map(function (e) {
+        return e.id;
+      })
+      .indexOf(id, 0);
+
+    students.splice(index, 1);
     history("/");
   };
 
-  const [open, setOpen] = React.useState(false);
+  const handleEditMethod = (id, stu) => {
+    console.log('neymar', id)
+    
+    setStudents(students.map((student) => (student.id === id ? stu : student)));
+    
+  };
 
-  const handleClickOpen = () => {
-    setOpen(true);
+  const handleAdd = (stu) => {
+    
+    // console.log("My name is " + stu.name);
+    let stud = {
+      id: stu.id,
+      name: stu.name,
+      age: stu.age,
+      std: stu.std,
+      rollNo: stu.ollNo,
+    };
+    // students.push(stu)
   };
-  const handleClickClose = () => {
-    setOpen(false);
-  };
+
+  function handleEdit(e,id) {
+    e.preventDefault();
+    handleShowEdit(id);
+     return students.filter((student) => student.id === id);
+  }
 
   return (
     <>
       <div className="container" style={{ margin: "10rem" }}>
-      <h1>Students Table</h1>
-      <div className="d-flex justify-content-end">
-      <button
-          className="btn btn-primary my-2 "
-          onClick={handleClickOpen}
-        >
-          Create
-        </button>
-        
-
-      </div>
+        <h1>Students Table</h1>
+        <div className="d-flex justify-content-end">
+          <button
+            className="btn btn-primary btn-sm mx-1 my-1"
+            onClick={handleShowAdd}
+          >
+            Create
+          </button>
+        </div>
         <Table size="" striped borderd hover variant="dark">
           <thead>
             <tr>
@@ -67,36 +81,48 @@ function Home() {
             </tr>
           </thead>
           <tbody>
-            {Students && Students.length > 0
-              ? Students.map((item) => {
+            {students && students.length > 0
+              ? students.map((student) => {
                   return (
-                    <tr>
-                      <td>{item.name} </td>
-                      <td>{item.age}</td>
-                      <td>{item.std}</td>
-                      <td>{item.rollNo}</td>
+                    <tr key={student.id}>
+                      <td>{student.name} </td>
+                      <td>{student.age}</td>
+                      <td>{student.std}</td>
+                      <td>{student.rollNo}</td>
 
                       <td>
-                        <button className="btn btn-primary btn-sm" onClick={() => handleDelete(item.id)}>
+                        <button
+                          className="btn btn-primary btn-sm mx-1 my-1"
+                          onClick={() => handleDelete(student.id)}
+                        >
                           DELETE
                         </button>
+
                         &nbsp;
-                        <Link to={"/edit"}>
-                          <button
-                          className="btn btn-primary btn-sm"
-                            onClick={() =>
-                              handleEdit(
-                                item.id,
-                                item.name,
-                                item.age,
-                                item.std,
-                                item.rollNo
-                              )
-                            }
-                          >
-                            EDIT
-                          </button>
-                        </Link>
+
+                        <button
+                          className="btn btn-primary btn-sm mx-1 my-1"
+                           onClick={(e) => handleEdit(e,student.id)}
+                          // onClick={handleEdit}
+                        >
+                          EDIT
+                        </button>
+                        {/* for editing */}
+                        <Modal show={showEdit} onHide={handleCloseEdit}>
+                          <Modal.Header closeButton>
+                            <Modal.Title>Edit</Modal.Title>
+                          </Modal.Header>
+                          <Modal.Body>
+                            {" "}
+                            <Edit
+                              student={student}
+                              addMethod={handleShowEdit}
+                              // handleAdd={handleAdd}
+                              handleEditMethod={handleEditMethod}
+                              // handleEdit={handleEdit}
+                            />
+                          </Modal.Body>
+                        </Modal>
                       </td>
                     </tr>
                   );
@@ -105,22 +131,22 @@ function Home() {
           </tbody>
         </Table>
         <br></br>
-        {/* <Link stdname="d-grid gap-2" to="/create"> */}
-        {/* </Link> */}
-        <Dialog open={open} fullWidth maxwidth="sm" onClose={handleClickClose}>
-          <DialogTitle>{"Add"}</DialogTitle>
-          <DialogContent>
-            <DialogContentText style={{ height: "250px" }}>
-              <Add />
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClickClose}>Close</Button>
-          </DialogActions>
-        </Dialog>
 
-        
-        
+        {/* //for adding */}
+        <Modal show={showAdd} onHide={handleCloseAdd}>
+          <Modal.Header closeButton>
+            <Modal.Title>Add</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {" "}
+            <Add
+              student={students}
+              onClick={handleCloseAdd}
+              addMethod={handleShowAdd}
+            />
+          </Modal.Body>
+          <Modal.Footer></Modal.Footer>
+        </Modal>
       </div>
     </>
   );
